@@ -1,46 +1,55 @@
 # RacquetBuild
 
-RacquetBuild is a squash racquet fitting and configuration project. The first product direction is a mobile-friendly web app that helps beginner and intermediate players understand how racquet choices change feel, power, control, and maneuverability.
+An engineering bench for squash racquets. Tune a build — head shape, weight, balance,
+string tension and grip — and read the trade-offs in **power, control, maneuverability,
+forgiveness and comfort**, drawn live on a blueprint. No jargon, no marketing: a
+transparent heuristic on a drafting table.
 
-## Product Direction
+> ⚠ RacquetBuild is a learning tool. Scores come from a hand-set heuristic model, not
+> manufacturer measurements or a real racquet database.
 
-- Fit quiz for players choosing their first serious squash racquet.
-- Configuration simulator for players tuning a racquet they already own.
-- 3D racquet preview powered by Three.js / React Three Fiber.
-- Clear output language: power, control, forgiveness, maneuverability, touch, and player level fit.
+## Surfaces
 
-## Configuration Model
+- **`/build` — Configuration bench.** Adjust five variables and watch the five scores, the
+  trade-off explanation, and a parametric blueprint drawing update in real time. Every
+  build is encoded in the URL (`?c=…`) so any setup is shareable.
+- **`/quiz` — Fit worksheet.** Five quick questions produce a recommended starting build
+  with plain-language reasoning, then drop you into the bench pre-loaded.
+- **`/about` — Model spec.** The exact influence of each variable, rendered straight from
+  the scoring coefficient tables.
 
-Early variables to model:
+## How it works
 
-- Racquet shape: teardrop, traditional/closed throat, hybrid.
-- Static weight and balance: head light, even, head heavy.
-- String tension: lower tension for power and comfort, higher tension for control.
-- Grip setup: replacement grip, overgrip thickness, tackiness, sweat handling.
-- Player intent: beginner-friendly, intermediate all-round, advanced control, advanced power.
+A single pure, deterministic **scoring engine** maps a configuration to a five-axis score
+vector (baseline 50, additive per-variable deltas, linear tension term, clamped 0–100).
+Both consumers reuse it:
 
-## Tech Stack
+- The **bench** runs it forward (config → scores).
+- The **worksheet** runs it inverse: it turns your answers into an emphasis weighting and
+  searches the full grid of builds for the closest match.
 
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- Three.js with React Three Fiber and drei
-- Zustand for client-side configuration state
-- Vercel-ready deployment shape
+The engine, recommender, quiz mapping and share codec live in [`src/lib`](src/lib) — pure,
+framework-agnostic, and fully unit-tested.
 
-## Local Development
+## Tech
+
+- Next.js 16 (App Router) · React 19 · TypeScript
+- Tailwind CSS v4 — a custom "drafting table" design system
+- Zustand for bench state · URL-encoded shareable builds
+- Three.js + React Three Fiber + drei for the lazy blueprint preview (with an SVG fallback)
+- Vitest for the engine, recommender and codec tests
+
+## Local development
 
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:3000
+npm test         # unit tests
+npm run build    # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+## Documentation
 
-## Next Steps
-
-1. Write the product spec for the quiz, simulator, scoring model, and 3D preview.
-2. Create the initial configuration data model.
-3. Build the mobile-first simulator workflow.
-4. Add the first lightweight 3D racquet scene.
-5. Create the GitHub remote and connect Vercel deployment.
+- [Product plan](docs/product-plan.md)
+- [Engineering spec sheet](docs/spec.md)
+- [Implementation plan](docs/superpowers/plans/2026-06-15-racquetbuild-mvp.md)
