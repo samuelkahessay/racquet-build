@@ -1,5 +1,7 @@
 # RacquetBuild
 
+**Live:** https://racquet-build.vercel.app
+
 An engineering bench for squash racquets. Tune a build — head shape, weight, balance,
 string tension and grip — and read the trade-offs in **power, control, maneuverability,
 forgiveness and comfort**, drawn live on a blueprint. No jargon, no marketing: a
