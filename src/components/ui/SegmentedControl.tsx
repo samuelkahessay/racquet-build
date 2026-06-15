@@ -71,7 +71,7 @@ export function SegmentedControl<T extends string>({
               }}
               className={clsx(
                 "group relative flex flex-col items-start gap-0.5 px-3 py-2.5 text-left transition-colors",
-                "not-last:border-r border-rule-major",
+                "border-rule-major [&:not(:last-child)]:border-r",
                 active ? "bg-paper" : "bg-paper-2/60 hover:bg-paper-2",
               )}
             >
