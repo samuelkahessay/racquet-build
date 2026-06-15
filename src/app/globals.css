@@ -1,18 +1,233 @@
 @import "tailwindcss";
 
+/*
+  RacquetBuild — "Drafting Table" design system.
+  Warm engineering vellum, blue-charcoal ink, vermilion correction-pencil accent,
+  and a deep cyanotype "blueprint negative" reserved for drawings. No dark-mode glow,
+  no cyan-on-black, no glassmorphism. Mono is used only for real numeric data.
+*/
+
 :root {
-  --background: #f7f8f4;
-  --foreground: #151711;
+  /* paper / surfaces — warm off-whites, never pure white */
+  --paper: oklch(0.972 0.008 80);
+  --paper-2: oklch(0.948 0.012 78);
+  --paper-3: oklch(0.917 0.015 76);
+
+  /* ink — dark blue-charcoal, never pure black */
+  --ink: oklch(0.3 0.035 250);
+  --ink-2: oklch(0.46 0.03 250);
+  --ink-3: oklch(0.62 0.025 250);
+
+  /* engineering grid ruling */
+  --rule: oklch(0.5 0.04 250 / 0.16);
+  --rule-major: oklch(0.45 0.05 252 / 0.26);
+  --grid-minor: oklch(0.55 0.04 245 / 0.09);
+  --grid-major: oklch(0.5 0.05 250 / 0.16);
+
+  /* vermilion correction-pencil accent (the single signal color) */
+  --accent: oklch(0.585 0.2 31);
+  --accent-deep: oklch(0.5 0.19 31);
+  --accent-wash: oklch(0.585 0.2 31 / 0.12);
+
+  /* deep cyanotype blueprint — for drawing insets only */
+  --blueprint: oklch(0.345 0.088 252);
+  --blueprint-2: oklch(0.295 0.082 254);
+  --blueprint-ink: oklch(0.9 0.045 228);
+  --blueprint-ink-2: oklch(0.78 0.06 226);
+
+  --grid-size: 24px;
+
+  --font-display: var(--font-archivo), "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-major: var(--rule-major);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-blueprint: var(--blueprint);
+  --color-blueprint-2: var(--blueprint-2);
+  --color-blueprint-ink: var(--blueprint-ink);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    color: var(--ink);
+    background-color: var(--paper);
+    /* engineering graph paper: fine 24px ruling + heavier 120px major ruling */
+    background-image:
+      linear-gradient(var(--grid-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+      linear-gradient(var(--grid-minor) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px);
+    background-size:
+      120px 120px,
+      120px 120px,
+      var(--grid-size) var(--grid-size),
+      var(--grid-size) var(--grid-size);
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  ::selection {
+    background: var(--accent-wash);
+    color: var(--accent-deep);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* uppercase stencil-style drafting label */
+  .label {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  /* numeric / coordinate readout — mono, tabular */
+  .readout {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* a sheet panel framed like a drawing on the board */
+  .sheet {
+    background: var(--paper);
+    border: 1px solid var(--rule-major);
+    box-shadow: 0 1px 0 oklch(0.45 0.05 252 / 0.08);
+  }
+
+  /* drawing title block: corner-ticked frame */
+  .title-block {
+    position: relative;
+    border: 1.5px solid var(--ink);
+  }
+  .title-block::before,
+  .title-block::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid var(--accent);
+  }
+  .title-block::before {
+    top: -1.5px;
+    left: -1.5px;
+    border-right: none;
+    border-bottom: none;
+  }
+  .title-block::after {
+    bottom: -1.5px;
+    right: -1.5px;
+    border-left: none;
+    border-top: none;
+  }
+
+  /* deep cyanotype inset for drawings */
+  .blueprint-panel {
+    background: radial-gradient(120% 120% at 50% 0%, var(--blueprint) 0%, var(--blueprint-2) 100%);
+    color: var(--blueprint-ink);
+    border: 1px solid var(--blueprint-2);
+  }
+
+  /* measured draughting slider */
+  .draft-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 28px;
+    background: transparent;
+    cursor: ew-resize;
+  }
+  .draft-range::-webkit-slider-runnable-track {
+    height: 6px;
+    background: linear-gradient(
+      to right,
+      var(--accent) 0%,
+      var(--accent) var(--pct, 50%),
+      var(--paper-3) var(--pct, 50%),
+      var(--paper-3) 100%
+    );
+    border: 1px solid var(--rule-major);
+  }
+  .draft-range::-moz-range-track {
+    height: 6px;
+    background: var(--paper-3);
+    border: 1px solid var(--rule-major);
+  }
+  .draft-range::-moz-range-progress {
+    height: 6px;
+    background: var(--accent);
+  }
+  .draft-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -8px;
+    width: 4px;
+    height: 22px;
+    background: var(--ink);
+    border: none;
+    box-shadow: -3px 0 0 var(--paper), 3px 0 0 var(--paper);
+  }
+  .draft-range::-moz-range-thumb {
+    width: 4px;
+    height: 22px;
+    border: none;
+    border-radius: 0;
+    background: var(--ink);
+  }
+
+  /* horizontal measured dimension rule with end ticks */
+  .dim-rule {
+    position: relative;
+    height: 1px;
+    background: var(--rule-major);
+  }
+  .dim-rule::before,
+  .dim-rule::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    width: 1px;
+    height: 7px;
+    background: var(--rule-major);
+  }
+  .dim-rule::before {
+    left: 0;
+  }
+  .dim-rule::after {
+    right: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
