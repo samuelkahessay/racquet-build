@@ -37,6 +37,14 @@ Both consumers reuse it:
 The engine, recommender, catalog mapping, quiz mapping and share codec live in
 [`src/lib`](src/lib) — pure, framework-agnostic, and fully unit-tested.
 
+## Racquet drawing fidelity
+
+The live blueprint in [`src/components/preview`](src/components/preview) uses a pure SVG
+geometry model calibrated against squash-specific references: World Squash dimensional
+limits, teardrop/open-throat long-main string beds, and traditional bridged heads with
+shorter mains. The head outline is sampled from cubic curves so the upper head stays
+broad and rounded before tapering smoothly into the throat.
+
 ## Tech
 
 - Next.js 16 (App Router) · React 19 · TypeScript

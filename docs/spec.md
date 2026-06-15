@@ -10,7 +10,7 @@
 RacquetBuild is a mobile-first web app that helps beginner and intermediate squash
 players understand racquet attributes, get a recommended starting setup, and tune an
 existing setup with clear trade-offs. It is a **single-page configuration console** with
-a guided **fit quiz**, a live **configuration simulator**, a stylized **3D blueprint
+a guided **fit quiz**, a live **configuration simulator**, a stylized **SVG blueprint
 preview**, and **shareable URL-encoded builds**.
 
 The product's technical core is one **pure, deterministic scoring engine** that maps a
@@ -36,7 +36,7 @@ hero blur). See §11.
   explanation of what changed and why.
 - G2 — A player can take a short fit quiz and receive a recommended build with
   beginner-friendly reasoning, then drop straight into the simulator pre-loaded with it.
-- G3 — A stylized 3D blueprint racquet reflects visible config changes (shape, balance
+- G3 — A stylized SVG blueprint racquet reflects visible config changes (shape, balance
   emphasis, grip thickness/color, string-bed tension).
 - G4 — Any build is encodable to a short shareable URL and restorable from it.
 - G5 — The scoring model is transparent, deterministic, fully unit-tested, and tunable
@@ -67,7 +67,7 @@ Enters via the **Quiz**, gets a recommended build + explanation, explores variat
 
 ### Flows
 - F1 Quiz → Result → "Open in simulator" (config pre-loaded).
-- F2 Direct simulator → adjust controls → read scores + explanation → 3D updates live.
+- F2 Direct simulator → adjust controls → read scores + explanation → blueprint updates live.
 - F3 Simulator → "Copy build link" → URL carries full config → recipient lands on F2 with that config.
 
 ---
@@ -75,13 +75,13 @@ Enters via the **Quiz**, gets a recommended build + explanation, explores variat
 ## 4. Information Architecture & Routes
 
 Single Next.js App Router application. Server Components for static shell; client
-"islands" for the interactive simulator, quiz, and 3D canvas.
+"islands" for the interactive simulator and quiz.
 
 | Route | Type | Purpose |
 |---|---|---|
 | `/` | Server (static) shell | Landing/console: hero "spec plate", what the tool does, primary CTAs into the quiz and the simulator. No interactive config state here. |
 | `/quiz` | Client island in server shell | Multi-step fit quiz; on submit, routes to `/build?c=<encoded>`. |
-| `/build` | Client island in server shell | The canonical simulator "workbench": controls + readouts + 3D preview. Reads `?c=` (config) on load; writes `?c=` on change (shallow). This is the only place config state lives. |
+| `/build` | Client island in server shell | The canonical simulator "workbench": controls + readouts + SVG blueprint preview. Reads `?c=` (config) on load; writes `?c=` on change (shallow). This is the only place config state lives. |
 | `/racquets` | Server (static) | Source-backed seed catalog of real squash racquet specs, with derived model mapping and links into `/build`. |
 | `/about` | Server (static) | What the model is and isn't; how scores are derived (transparency page). |
 
@@ -290,7 +290,7 @@ Location: `src/components/simulator/`, state in `src/lib/state/` (Zustand).
   with a numeric readout.
 - Grip — 4-way segmented.
 
-Each control change updates the Zustand store synchronously; scores, explanation, 3D, and
+Each control change updates the Zustand store synchronously; scores, explanation, drawing, and
 the `?c=` URL update reactively.
 
 ### 8.2 Readouts (right/top panel)
@@ -307,25 +307,31 @@ from `?c=` if present, else `DEFAULT_CONFIG`.
 
 ---
 
-## 9. 3D Blueprint Preview
+## 9. Parametric SVG Blueprint Preview
 
-Location: `src/components/preview3d/`. React Three Fiber + drei, lazy-loaded (dynamic
-import, `ssr: false`) so it never blocks first paint or runs on the server.
+Location: `src/components/preview/`. Pure SVG, rendered from deterministic geometry so it
+can run on the server and does not depend on WebGL.
 
 Stylized **technical wireframe** racquet (matches the blueprint aesthetic — this is a
 feature, not a limitation). Parametric from `RacquetConfig`:
 
 | Config variable | Visible effect |
 |---|---|
-| shape | head outline: teardrop = open throat / elongated; traditional = closed throat with bridge; hybrid = blended outline |
+| shape | head outline: teardrop = elongated long-string throat; traditional = compact bridged head; hybrid = blended outline with small yoke |
 | balance | a balance-point marker / weight-ring slides toward head or handle; subtle emphasis glow |
 | grip thickness | handle radius scales (stock→thin→thick); grip color/material changes (tacky = distinct hue) |
 | string tension | string-bed line density/brightness: higher tension = tighter, brighter lattice |
 
-Constraints: stylized line-art with a faint reference grid and dimension ticks; runs at
-60 fps on mobile; `<dpr>` capped; pauses rendering when offscreen/tab hidden (drei
-`<PerformanceMonitor>` / `frameloop="demand"`). Graceful fallback: if WebGL is
-unavailable, show a static SVG blueprint silhouette driven by the same params.
+Reference constraints:
+- World Squash racket limits: 686 mm maximum length, 215 mm maximum width, 390 mm maximum
+  string length, 500 cm2 maximum strung area.
+- Teardrop/open-throat squash frames have longer mains that run deeper toward the shaft.
+- Traditional/bridged frames use a compact rounded head and shorter mains above the bridge.
+
+Implementation constraints: the head outline is sampled from explicit cubic curves, not
+freehand SVG path strings. Keep the upper head broad and rounded, then taper smoothly
+toward the throat. Geometry tests should guard length/string limits, bridge/yoke presence,
+main-string ordering, and broad non-pinched head profiles across all three shapes.
 
 ---
 
@@ -383,18 +389,15 @@ technical. Iconography is line-based and consistent (lucide-react, already insta
   native range with labels), quiz steps, copy button.
 - Color is never the only signal — bars/radar carry text values; active states have shape
   or border changes, not just hue. Verify contrast ≥ WCAG AA for text and data.
-- 3D canvas is decorative/secondary: has an accessible label and a non-canvas equivalent
-  (the numeric readouts convey the same information); respects `prefers-reduced-motion`
-  (disable count-ups, freeze 3D auto-rotation).
+- SVG blueprint is decorative/secondary: has an accessible label, while the numeric
+  readouts convey the same information; respects `prefers-reduced-motion` for count-ups.
 - Semantic landmarks, focus-visible styles consistent with the blueprint accent.
 
 ---
 
 ## 13. Performance Budgets
 
-- First load (excluding 3D island): JS ≤ ~150 KB gzip; LCP-eligible content is HTML/CSS,
-  not the canvas.
-- 3D bundle (three / R3F / drei) is **lazy** and excluded from the critical path.
+- First load: JS ≤ ~150 KB gzip; LCP-eligible content is HTML/CSS/SVG.
 - No chart library — radar/bars are hand-rolled SVG (the engine output is five numbers).
 - Scoring/recommender run client-side in <1 ms; no network round-trip for interaction.
 - Images: none required beyond SVG; use `next/font` (already wired) — no layout shift.
@@ -423,14 +426,14 @@ src/
     ui/                   # segmented control, slider, spec-plate, readout bar, radar
     simulator/            # workbench composition
     quiz/                 # quiz stepper + result
-    preview3d/            # R3F scene (lazy)
+    preview/              # pure-SVG racquet drawing + geometry
 docs/
   product-plan.md  spec.md  (and implementation plan to follow)
 ```
 
 Separation of concerns: `lib/` is framework-agnostic and pure (engine, codec, quiz
 mapping) — independently testable and the locus of the codex review. `components/` and
-`app/` hold all React/Next/DOM/WebGL concerns. The store is the single bridge.
+`app/` hold all React/Next/DOM/SVG concerns. The store is the single bridge.
 
 ---
 
@@ -456,7 +459,7 @@ mapping) — independently testable and the locus of the codex review. `componen
 2. Create a **public** GitHub repo `racquet-build` (owner `samuelkahessay`); push `main`.
 3. Deploy to **Vercel** (production) via the Vercel CLI; framework auto-detected (Next.js
    16). No env vars required for v1 (no backend/secrets).
-4. Verify the production URL renders the console, simulator, quiz, 3D preview, and that a
+4. Verify the production URL renders the console, simulator, quiz, SVG preview, and that a
    shared `?c=` link restores a build.
 5. Preview deployments available for subsequent iteration.
 
@@ -468,7 +471,7 @@ mapping) — independently testable and the locus of the codex review. `componen
 |---|---|
 | Brand/name styling | **RacquetBuild** (one word), as already in code/metadata. |
 | Real model data vs. generic | **Generic profiles only** for v1; brand/model DB deferred to phase 2. |
-| 3D preview detail before launch | **Stylized wireframe blueprint** — intentional aesthetic, not a stopgap. |
+| Preview detail before launch | **Stylized SVG wireframe blueprint** — intentional aesthetic, not a stopgap. |
 | Saved builds: accounts vs. shareable state | **URL-encoded shareable state**, no accounts. |
 
 ---

@@ -6,7 +6,7 @@ export type Pt = [number, number]; // centered coords, y-up
 export interface RacquetGeometry {
   /** Closed frame centerline (head arc + throat rails). Stroke this with `beamWidth`. */
   frame: Pt[];
-  /** Closed-throat bridge line (traditional only); null for open-throat frames. */
+  /** Throat bridge/yoke line; null for full teardrop frames. */
   bridge: Pt[] | null;
   /** Filled grip wrap on the handle. */
   grip: { topY: number; buttY: number; halfW: number; accent: boolean };
@@ -21,29 +21,71 @@ export interface RacquetGeometry {
 }
 
 /**
- * Real squash proportions drive these numbers (overall ~686 mm long, head a long
- * narrow oval, a long throat, ~180 mm handle). Geometry units are roughly mm.
+ * World Squash caps full racket length at 686 mm, width at 215 mm, string length
+ * at 390 mm, and strung area at 500 cm2. Geometry units here are roughly mm.
  */
 interface ShapeSpec {
-  headHalfW: number; // max half-width of the head
-  headCy: number; // ellipse centre y
-  headHH: number; // ellipse half-height (head is tall + narrow)
-  lowerTaper: number; // 0..1 — how much the lower head pinches toward the throat
-  junction: number; // angle from the top (×π) where the head hands off to the rails
+  topY: number;
+  maxHalfW: number;
+  // Right-side outline from the top tip to the throat/shaft.
+  start: Pt;
+  curves: { c1: Pt; c2: Pt; to: Pt }[];
   shaftHalf: number; // frame half-width where the rails meet the handle
-  closed: boolean; // closed (bridged) throat vs. open teardrop
+  bridge: null | {
+    kind: "straight" | "arch" | "yoke";
+    sideY: number;
+    centerY: number;
+    halfW: number;
+  };
 }
 
 const HANDLE_TOP_Y = 188; // shaft/handle junction — handle is ~188 below it to the butt
 const BUTT_Y = 0;
+const MAX_STRING_LENGTH = 390;
 
 const SHAPE: Record<RacquetConfig["shape"], ShapeSpec> = {
-  // open throat, strings run deep into a long teardrop
-  teardrop: { headHalfW: 86, headCy: 486, headHH: 200, lowerTaper: 0.26, junction: 0.66, shaftHalf: 9, closed: false },
-  // rounder head closed by a bridge, shorter throat
-  traditional: { headHalfW: 93, headCy: 470, headHH: 178, lowerTaper: 0.6, junction: 0.78, shaftHalf: 12, closed: true },
-  // a balanced blend of the two
-  hybrid: { headHalfW: 89, headCy: 480, headHH: 192, lowerTaper: 0.42, junction: 0.71, shaftHalf: 11, closed: false },
+  // Carboflex-like teardrop: long main strings descend into a narrow monoshaft.
+  teardrop: {
+    topY: 684,
+    maxHalfW: 96,
+    start: [0, 684],
+    curves: [
+      { c1: [24, 684], c2: [60, 672], to: [78, 640] },
+      { c1: [94, 610], c2: [98, 560], to: [90, 512] },
+      { c1: [82, 438], c2: [61, 354], to: [36, 284] },
+      { c1: [23, 246], c2: [15, 210], to: [9, HANDLE_TOP_Y] },
+    ],
+    shaftHalf: 9,
+    bridge: null,
+  },
+  // Classic bridged head: squarer/compact string bed, shorter mains, straight bridge.
+  traditional: {
+    topY: 670,
+    maxHalfW: 102,
+    start: [0, 670],
+    curves: [
+      { c1: [34, 672], c2: [84, 658], to: [98, 610] },
+      { c1: [106, 572], c2: [105, 514], to: [95, 468] },
+      { c1: [86, 418], c2: [66, 366], to: [50, 342] },
+      { c1: [38, 318], c2: [22, 232], to: [14, HANDLE_TOP_Y] },
+    ],
+    shaftHalf: 14,
+    bridge: { kind: "arch", sideY: 342, centerY: 330, halfW: 50 },
+  },
+  // Evolution-style hybrid: teardrop-ish outer frame with a small throat yoke/opening.
+  hybrid: {
+    topY: 680,
+    maxHalfW: 98,
+    start: [0, 680],
+    curves: [
+      { c1: [28, 681], c2: [66, 668], to: [84, 636] },
+      { c1: [99, 604], c2: [99, 556], to: [90, 510] },
+      { c1: [80, 444], c2: [64, 376], to: [42, 306] },
+      { c1: [30, 258], c2: [17, 208], to: [11, HANDLE_TOP_Y] },
+    ],
+    shaftHalf: 11,
+    bridge: { kind: "yoke", sideY: 304, centerY: 278, halfW: 36 },
+  },
 };
 
 // heavier frames carry a visibly thicker beam (real beams run 16–21 mm)
@@ -71,85 +113,109 @@ const BALANCE_Y: Record<RacquetConfig["balance"], number> = {
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 
-/** Head ellipse point at angle `phi` (0 = top tip, increasing toward the throat). */
-function headPoint(s: ShapeSpec, phi: number): Pt {
-  const cos = Math.cos(phi);
-  const taper = cos < 0 ? lerp(1, s.lowerTaper, -cos) : 1; // pinch the lower half
-  const x = s.headHalfW * Math.sin(phi) * taper;
-  const y = s.headCy + s.headHH * cos;
-  return [x, y];
-}
-
-/** Quadratic-bezier throat rail from the head flank `a` down to the shaft `b`. */
-function rail(a: Pt, b: Pt, seg = 12): Pt[] {
-  // control point pulls the rail into a gentle concave sweep
-  const c: Pt = [b[0] + (a[0] - b[0]) * 0.22, a[1] * 0.42 + b[1] * 0.58];
-  const out: Pt[] = [];
-  for (let i = 1; i <= seg; i++) {
-    const t = i / seg;
-    const u = 1 - t;
-    out.push([
-      u * u * a[0] + 2 * u * t * c[0] + t * t * b[0],
-      u * u * a[1] + 2 * u * t * c[1] + t * t * b[1],
-    ]);
+function sampleCubic(start: Pt, curves: ShapeSpec["curves"], samplesPerSegment = 14): Pt[] {
+  const out: Pt[] = [start];
+  let from = start;
+  for (const { c1, c2, to } of curves) {
+    for (let j = 1; j <= samplesPerSegment; j++) {
+      const t = j / samplesPerSegment;
+      const u = 1 - t;
+      out.push([
+        u ** 3 * from[0] + 3 * u ** 2 * t * c1[0] + 3 * u * t ** 2 * c2[0] + t ** 3 * to[0],
+        u ** 3 * from[1] + 3 * u ** 2 * t * c1[1] + 3 * u * t ** 2 * c2[1] + t ** 3 * to[1],
+      ]);
+    }
+    from = to;
   }
   return out;
 }
 
+function sampleBridge(bridge: NonNullable<ShapeSpec["bridge"]>): Pt[] {
+  if (bridge.kind === "straight") {
+    return [
+      [-bridge.halfW, bridge.sideY],
+      [bridge.halfW, bridge.sideY],
+    ];
+  }
+
+  const pts: Pt[] = [];
+  for (let i = 0; i <= 16; i++) {
+    const t = i / 16;
+    const x = lerp(-bridge.halfW, bridge.halfW, t);
+    const ax = Math.abs(x) / bridge.halfW;
+    const y = bridge.centerY + (bridge.sideY - bridge.centerY) * ax * ax;
+    pts.push([x, y]);
+  }
+  return pts;
+}
+
 export function buildRacquetGeometry(config: RacquetConfig): RacquetGeometry {
   const s = SHAPE[config.shape];
-  const junctionPhi = Math.PI * s.junction;
 
-  // right half of the frame, top tip -> shaft (head arc, then throat rail)
-  const SEG = 60;
-  const headTopY = s.headCy + s.headHH;
-  const right: Pt[] = [];
-  for (let i = 0; i <= SEG; i++) {
-    const phi = junctionPhi * (i / SEG);
-    right.push(headPoint(s, phi));
-  }
-  const flank = right[right.length - 1];
-  right.push(...rail(flank, [s.shaftHalf, HANDLE_TOP_Y]));
+  // Right half of the frame, top tip -> shaft, sampled from real-racket curve segments.
+  const right = sampleCubic(s.start, s.curves);
 
   // closed frame loop: right side down, then mirrored left side back up
   const left = right.map(([x, y]) => [-x, y] as Pt).reverse();
   const frame: Pt[] = [...right, ...left];
 
-  // closed throat: a bridge spanning the lower head
-  const bridgeY = s.headCy - s.headHH * 0.62;
-  const bridge: Pt[] | null = s.closed
-    ? [
-        [-s.headHalfW * 0.42, bridgeY],
-        [s.headHalfW * 0.42, bridgeY],
-      ]
-    : null;
+  const bridge: Pt[] | null = s.bridge ? sampleBridge(s.bridge) : null;
+
+  const halfWidthAtY = (y: number): number => {
+    const hits: number[] = [];
+    for (let i = 0; i < right.length - 1; i++) {
+      const a = right[i];
+      const b = right[i + 1];
+      if ((y <= a[1] && y >= b[1]) || (y >= a[1] && y <= b[1])) {
+        const dy = b[1] - a[1];
+        const t = Math.abs(dy) < 0.001 ? 0 : (y - a[1]) / dy;
+        hits.push(lerp(a[0], b[0], clamp01(t)));
+      }
+    }
+    return hits.length === 0 ? 0 : Math.max(...hits);
+  };
 
   // ---- string bed -------------------------------------------------------
   const t01 = clamp01((config.stringTensionLb - TENSION_MIN) / (TENSION_MAX - TENSION_MIN));
-  const nMains = Math.round(lerp(7, 13, t01));
-  const nCrosses = Math.round(lerp(9, 16, t01));
+  const nMains = Math.round(lerp(11, 15, t01));
+  const nCrosses = Math.round(lerp(13, 19, t01));
   const stringBrightness = lerp(0.4, 1, t01);
 
-  const wBed = s.headHalfW * 0.9; // inset from the beam
-  const hBed = s.headHH * 0.9;
-  const flankX = Math.abs(flank[0]);
-  const flankY = flank[1];
-  const bedFloor = s.closed ? bridgeY : HANDLE_TOP_Y + 6; // open throats string to the shaft
+  const inset = BEAM_WIDTH[config.weightClass] * 0.62 + 3;
+  const innerHalfWidthAtY = (y: number): number => Math.max(0, halfWidthAtY(y) - inset);
+  const stringTopY = s.topY - 22;
+  const openBottomY = Math.max(HANDLE_TOP_Y + 9, stringTopY - MAX_STRING_LENGTH);
 
-  // lowest y a vertical string at |x| can reach before exiting the frame
-  const stringFloor = (ax: number): number => {
-    if (s.closed) return bridgeY;
-    if (ax <= s.shaftHalf) return bedFloor;
-    if (ax <= flankX) return lerp(flankY, bedFloor, (flankX - ax) / (flankX - s.shaftHalf));
-    return s.headCy - hBed * Math.sqrt(Math.max(0, 1 - (ax / wBed) ** 2));
+  const bridgeLimitAtX = (x: number): number | null => {
+    if (!s.bridge) return null;
+    const ax = Math.abs(x);
+    if (ax > s.bridge.halfW) return s.bridge.sideY;
+    if (s.bridge.kind === "straight") return s.bridge.sideY + 5;
+    const t = ax / s.bridge.halfW;
+    return s.bridge.centerY + (s.bridge.sideY - s.bridge.centerY) * t * t + 5;
+  };
+
+  const stringFloor = (x: number): number => {
+    const bridgeLimit = bridgeLimitAtX(x);
+    if (bridgeLimit !== null) return bridgeLimit;
+    const ax = Math.abs(x);
+    for (let y = openBottomY; y <= stringTopY; y += 2) {
+      if (innerHalfWidthAtY(y) >= ax) return y;
+    }
+    return openBottomY;
   };
 
   const mains: Pt[][] = [];
+  const mainHalfW = s.bridge ? s.bridge.halfW * 0.88 : s.maxHalfW * 0.72;
   for (let i = 0; i < nMains; i++) {
-    const x = lerp(-wBed, wBed, nMains === 1 ? 0.5 : i / (nMains - 1)) * 0.97;
-    const r = 1 - (x / wBed) ** 2;
-    if (r <= 0) continue;
-    const top = s.headCy + hBed * Math.sqrt(r);
+    const x = lerp(-mainHalfW, mainHalfW, nMains === 1 ? 0.5 : i / (nMains - 1));
+    let top = stringTopY;
+    for (let y = stringTopY; y >= openBottomY; y -= 2) {
+      if (innerHalfWidthAtY(y) >= Math.abs(x)) {
+        top = y;
+        break;
+      }
+    }
     const bottom = stringFloor(Math.abs(x));
     if (top - bottom < 8) continue;
     mains.push([
@@ -158,20 +224,14 @@ export function buildRacquetGeometry(config: RacquetConfig): RacquetGeometry {
     ]);
   }
 
-  // crosses span the head and, for open throats, continue down the teardrop
+  // crosses span the frame at the local inner width; teardrops continue lower.
   const crosses: Pt[][] = [];
-  const yTop = s.headCy + hBed;
-  const yBottom = s.closed ? bridgeY + 4 : HANDLE_TOP_Y + 10;
+  const yTop = stringTopY;
+  const yBottom = s.bridge ? Math.max(s.bridge.centerY, s.bridge.sideY) + 10 : openBottomY + 2;
   for (let i = 0; i < nCrosses; i++) {
     const y = lerp(yBottom, yTop, nCrosses === 1 ? 0.5 : i / (nCrosses - 1));
-    let halfW: number;
-    if (y >= s.headCy - hBed) {
-      const rel = (y - s.headCy) / hBed;
-      halfW = wBed * Math.sqrt(Math.max(0, 1 - rel * rel));
-    } else {
-      // throat region: interpolate the rail half-width
-      halfW = lerp(s.shaftHalf, flankX, clamp01((y - HANDLE_TOP_Y) / (flankY - HANDLE_TOP_Y)));
-    }
+    let halfW = innerHalfWidthAtY(y) * 0.92;
+    if (s.bridge && y <= s.bridge.sideY + 20) halfW = Math.min(halfW, s.bridge.halfW * 0.9);
     halfW *= 0.97;
     if (halfW < 4) continue;
     crosses.push([
@@ -181,7 +241,7 @@ export function buildRacquetGeometry(config: RacquetConfig): RacquetGeometry {
   }
 
   const beamWidth = BEAM_WIDTH[config.weightClass];
-  const xExtent = s.headHalfW + beamWidth / 2 + 6;
+  const xExtent = s.maxHalfW + beamWidth / 2 + 6;
 
   return {
     frame,
@@ -195,7 +255,7 @@ export function buildRacquetGeometry(config: RacquetConfig): RacquetGeometry {
     mains,
     crosses,
     centerLine: [
-      [0, headTopY + 10],
+      [0, s.topY + 10],
       [0, BUTT_Y - 10],
     ],
     balanceY: BALANCE_Y[config.balance],
@@ -205,7 +265,7 @@ export function buildRacquetGeometry(config: RacquetConfig): RacquetGeometry {
       minX: -xExtent,
       maxX: xExtent,
       minY: BUTT_Y - 12,
-      maxY: headTopY + 12,
+      maxY: s.topY + 12,
     },
   };
 }
