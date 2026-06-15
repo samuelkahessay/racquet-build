@@ -174,7 +174,11 @@ Baseline 50. `TENSION_PIVOT = 26`. Values are intentionally legible, not fitted.
 |---|---|---|---|---|---|
 | teardrop | +18 | −12 | +4 | +14 | +2 |
 | traditional | −10 | +18 | +6 | −12 | −2 |
-| hybrid | +4 | +4 | +5 | +2 | 0 |
+| hybrid | 0 | 0 | 0 | 0 | 0 |
+
+> `hybrid` is the **neutral reference shape** — the 50-baseline origin. Teardrop and
+> traditional are the biased shapes; hybrid is "no strong bias," so the default build
+> reads 50 across the board.
 
 **WEIGHT_DELTA**
 
