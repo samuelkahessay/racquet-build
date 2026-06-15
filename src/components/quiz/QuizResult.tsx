@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import type { Recommendation } from "@/lib/scoring/recommend";
 import { describe } from "@/lib/scoring/explain";
+import { score } from "@/lib/scoring/score";
 import { encodeConfig } from "@/lib/share/codec";
 import { SCORE_AXES } from "@/lib/domain/score";
 import {
@@ -23,7 +24,8 @@ export function QuizResult({
   recommendation: Recommendation;
   onRetake: () => void;
 }) {
-  const { config, scores } = recommendation;
+  const { config } = recommendation;
+  const scores = score(config); // display-rounded integers (recommendation.scores is raw)
   const summary = describe(config);
   const token = encodeConfig(config);
 
