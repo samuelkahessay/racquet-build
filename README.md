@@ -42,7 +42,7 @@ The engine, recommender, catalog mapping, quiz mapping and share codec live in
 - Next.js 16 (App Router) · React 19 · TypeScript
 - Tailwind CSS v4 — a custom "drafting table" design system
 - Zustand for bench state · URL-encoded shareable builds
-- Three.js + React Three Fiber + drei for the lazy blueprint preview (with an SVG fallback)
+- A pure-SVG parametric squash-racquet blueprint that reacts live to the config
 - Vitest for the engine, recommender and codec tests
 
 ## Local development
