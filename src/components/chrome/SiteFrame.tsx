@@ -1,0 +1,69 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { RacquetMark } from "./RacquetMark";
+
+const NAV = [
+  { href: "/build", label: "Bench", code: "01" },
+  { href: "/quiz", label: "Fit", code: "02" },
+  { href: "/about", label: "Spec", code: "03" },
+];
+
+export function SiteFrame({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-20 border-b border-rule-major bg-paper/85 backdrop-blur-[2px]">
+        {/* sheet metadata strip */}
+        <div className="hidden border-b border-rule px-4 py-1 readout text-[10px] uppercase tracking-[0.2em] text-ink-3 sm:flex sm:gap-6">
+          <span>Sheet 01 / 03</span>
+          <span>Rev. A</span>
+          <span>Units · lb / g / mm</span>
+          <span className="ml-auto">Squash · Configuration Bench</span>
+        </div>
+
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3">
+          <Link href="/" className="group flex items-center gap-3">
+            <span className="flex size-9 items-center justify-center border border-ink text-ink transition-colors group-hover:border-accent group-hover:text-accent">
+              <RacquetMark className="size-6" />
+            </span>
+            <span className="leading-none">
+              <span className="block font-display text-base font-extrabold uppercase tracking-[0.16em] text-ink">
+                Racquet<span className="text-accent">Build</span>
+              </span>
+              <span className="readout mt-1 block text-[10px] uppercase tracking-[0.22em] text-ink-3">
+                Drafting&nbsp;Bench
+              </span>
+            </span>
+          </Link>
+
+          <nav className="flex items-center gap-1 sm:gap-2">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex items-center gap-2 border border-transparent px-2.5 py-1.5 transition-colors hover:border-rule-major hover:bg-paper-2"
+              >
+                <span className="readout text-[10px] text-ink-3 group-hover:text-accent">
+                  {item.code}
+                </span>
+                <span className="label text-xs text-ink-2 group-hover:text-ink">{item.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      <main className="flex-1">{children}</main>
+
+      <footer className="mt-12 border-t border-rule-major">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-6 text-ink-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="readout text-[11px] uppercase tracking-[0.18em]">
+            RacquetBuild · Heuristic model · Not manufacturer data
+          </p>
+          <p className="readout text-[11px] uppercase tracking-[0.18em]">
+            Drawn to inform, not to spec a purchase
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
