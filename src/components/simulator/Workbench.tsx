@@ -30,7 +30,7 @@ import { TensionSlider } from "@/components/ui/TensionSlider";
 import { ReadoutBar } from "@/components/ui/ReadoutBar";
 import { RadarPlot } from "@/components/ui/RadarPlot";
 import { SpecPlate } from "@/components/ui/SpecPlate";
-import { PreviewCanvas } from "@/components/preview3d/PreviewCanvas";
+import { RacquetDrawing } from "@/components/preview/RacquetDrawing";
 
 const shapeOptions = SHAPES.map((s) => ({ value: s, label: SHAPE_LABELS[s], hint: SHAPE_HINTS[s] }));
 const weightOptions = WEIGHT_CLASSES.map((w) => ({
@@ -100,7 +100,7 @@ export function Workbench({ initialToken }: { initialToken: string | null }) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         {/* controls */}
-        <section className="sheet order-2 flex flex-col gap-5 p-4 lg:order-1 lg:col-span-4">
+        <section className="sheet order-2 flex flex-col gap-5 p-4 lg:order-1 lg:col-span-5">
           <h2 className="label text-xs text-ink-2">Inputs</h2>
           <SegmentedControl
             name="shape"
@@ -147,20 +147,22 @@ export function Workbench({ initialToken }: { initialToken: string | null }) {
         </section>
 
         {/* drawing */}
-        <section className="order-1 lg:order-2 lg:col-span-4">
-          <div className="blueprint-panel relative aspect-[3/4] w-full overflow-hidden">
-            <PreviewCanvas config={config} />
+        <section className="order-1 lg:order-2 lg:col-span-3">
+          <div className="blueprint-panel relative mx-auto aspect-[5/9] w-full max-w-[240px] overflow-hidden">
+            <div className="absolute inset-0 p-2">
+              <RacquetDrawing config={config} />
+            </div>
             {/* drawing HUD */}
             <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3">
-              <div className="flex items-start justify-between">
-                <span className="readout text-[10px] uppercase tracking-[0.18em] text-blueprint-ink/80">
-                  {SHAPE_LABELS[config.shape]} · plan view
+              <div className="flex items-start justify-between gap-2">
+                <span className="readout text-[10px] uppercase tracking-[0.16em] text-blueprint-ink/80">
+                  {SHAPE_LABELS[config.shape]}
                 </span>
-                <span className="readout text-[10px] text-blueprint-ink/80">scale 1:1</span>
+                <span className="readout text-[10px] text-blueprint-ink/80">plan</span>
               </div>
-              <div className="flex items-end justify-between">
+              <div className="flex items-end justify-between gap-2">
                 <span className="readout text-[10px] text-blueprint-ink/80">
-                  {config.stringTensionLb} lb · {GRIP_LABELS[config.grip].toLowerCase()}
+                  {config.stringTensionLb} lb
                 </span>
                 <span className="readout text-[10px] text-blueprint-ink/80">
                   {BALANCE_LABELS[config.balance]}
@@ -168,13 +170,13 @@ export function Workbench({ initialToken }: { initialToken: string | null }) {
               </div>
             </div>
           </div>
-          <p className="mt-2 readout text-[10px] text-ink-3">
-            Stylized wireframe · reflects shape, balance, grip and string density.
+          <p className="mt-2 readout text-center text-[10px] text-ink-3">
+            2D drawing · reacts to shape, weight, balance, grip and tension.
           </p>
         </section>
 
         {/* outputs */}
-        <section className="order-3 flex flex-col gap-4 lg:col-span-4">
+        <section className="order-3 flex flex-col gap-4 lg:col-span-4 lg:order-3">
           <div className="sheet p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="label text-xs text-ink-2">Performance profile</h2>

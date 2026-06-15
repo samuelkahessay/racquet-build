@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { StaticBlueprint } from "@/components/preview3d/StaticBlueprint";
+import { RacquetDrawing } from "@/components/preview/RacquetDrawing";
 import { DEFAULT_CONFIG } from "@/lib/domain/config";
 import { AXIS_LABELS } from "@/lib/domain/labels";
 import { SCORE_AXES } from "@/lib/domain/score";
@@ -62,7 +62,9 @@ export default function Home() {
 
         {/* hero drawing */}
         <div className="blueprint-panel relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden">
-          <StaticBlueprint config={DEFAULT_CONFIG} />
+          <div className="absolute inset-0 p-3">
+            <RacquetDrawing config={DEFAULT_CONFIG} />
+          </div>
           <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3">
             <div className="flex justify-between">
               <span className="readout text-[10px] uppercase tracking-[0.18em] text-blueprint-ink/80">
