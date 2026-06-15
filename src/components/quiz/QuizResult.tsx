@@ -16,12 +16,15 @@ import {
 } from "@/lib/domain/labels";
 import { RadarPlot } from "@/components/ui/RadarPlot";
 import { ReadoutBar } from "@/components/ui/ReadoutBar";
+import type { CatalogRecommendation } from "@/lib/catalog";
 
 export function QuizResult({
   recommendation,
+  catalogMatches,
   onRetake,
 }: {
   recommendation: Recommendation;
+  catalogMatches: CatalogRecommendation[];
   onRetake: () => void;
 }) {
   const { config } = recommendation;
@@ -84,6 +87,38 @@ export function QuizResult({
               <li key={i} className="flex gap-2">
                 <span className="text-accent">›</span>
                 <span className="readout text-[12px] leading-snug text-ink-2">{line}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {catalogMatches.length > 0 && (
+        <div className="sheet p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="label text-xs text-ink-2">Closest real frames</h3>
+            <Link href="/racquets" className="readout text-[11px] text-accent-deep hover:text-accent">
+              Catalog
+            </Link>
+          </div>
+          <ul className="flex flex-col gap-2">
+            {catalogMatches.map(({ racquet }, i) => (
+              <li key={racquet.slug} className="border border-rule px-3 py-2">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="readout text-[10px] text-accent-deep">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="flex-1 font-display text-sm font-semibold text-ink">
+                    {racquet.brand} {racquet.model}
+                  </span>
+                  <span className="readout text-[10px] text-ink-3">
+                    {racquet.confidence.toUpperCase()}
+                  </span>
+                </div>
+                <p className="mt-1 readout text-[11px] text-ink-3">
+                  {racquet.advertisedWeightG} g · {racquet.balanceMm ?? "?"} mm ·{" "}
+                  {racquet.stringPattern ?? "pattern n/a"}
+                </p>
               </li>
             ))}
           </ul>

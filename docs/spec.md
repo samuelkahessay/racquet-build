@@ -44,7 +44,9 @@ hero blur). See §11.
 - G6 — Mobile-first, fast (see §13 budgets), accessible (§12), deployed on Vercel.
 
 ### Non-goals (explicitly out for v1)
-- N1 — Real brand/model racquet database (generic profiles only — phase 2).
+- N1 — Full editable brand/model database with admin tooling, price tracking, user
+  submissions, or crawl refresh jobs. The app may include a small source-backed seed
+  catalog that maps real frames into the generic model.
 - N2 — User accounts, auth, server-side persistence (share state is URL-encoded).
 - N3 — Community features: reviews, submitted setups, coach notes (phase 2).
 - N4 — Photorealistic 3D, physics simulation, or ball-flight modeling.
@@ -80,6 +82,7 @@ Single Next.js App Router application. Server Components for static shell; clien
 | `/` | Server (static) shell | Landing/console: hero "spec plate", what the tool does, primary CTAs into the quiz and the simulator. No interactive config state here. |
 | `/quiz` | Client island in server shell | Multi-step fit quiz; on submit, routes to `/build?c=<encoded>`. |
 | `/build` | Client island in server shell | The canonical simulator "workbench": controls + readouts + 3D preview. Reads `?c=` (config) on load; writes `?c=` on change (shallow). This is the only place config state lives. |
+| `/racquets` | Server (static) | Source-backed seed catalog of real squash racquet specs, with derived model mapping and links into `/build`. |
 | `/about` | Server (static) | What the model is and isn't; how scores are derived (transparency page). |
 
 > Routing note: this targets **Next.js 16** (App Router). Confirm current conventions in

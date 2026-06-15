@@ -95,8 +95,9 @@ export default function AboutPage() {
       <div className="mt-6 flex flex-col gap-4 text-base leading-relaxed text-ink-2">
         <p>
           RacquetBuild is a <strong className="text-ink">transparent heuristic</strong>, not a
-          measurement of any real racquet. It exists to make the trade-offs between common
-          configuration choices legible to beginner and intermediate players.
+          lab measurement of any racquet. It exists to make the trade-offs between common
+          configuration choices legible to beginner and intermediate players, then maps real
+          catalog frames into those same buckets when source-backed specs are available.
         </p>
         <p>
           Every axis starts at a <strong className="text-ink">baseline of 50</strong> — the neutral
@@ -149,9 +150,9 @@ export default function AboutPage() {
 
       <div className="mt-8 border border-rule-major bg-paper-2 p-4">
         <p className="readout text-[12px] leading-relaxed text-ink-2">
-          ⚠ This is a learning tool. Weights are hand-set for legibility, not fitted to data, and
-          there is no manufacturer model database. Treat the scores as directional intuition, not a
-          purchase spec.
+          This is a learning tool. Score weights are hand-set for legibility, not fitted to lab
+          data. Catalog entries cite source pages and preserve confidence notes, but scores remain
+          directional intuition rather than purchase instructions.
         </p>
       </div>
 

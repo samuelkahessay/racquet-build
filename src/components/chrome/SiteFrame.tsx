@@ -5,7 +5,8 @@ import { RacquetMark } from "./RacquetMark";
 const NAV = [
   { href: "/build", label: "Bench", code: "01" },
   { href: "/quiz", label: "Fit", code: "02" },
-  { href: "/about", label: "Spec", code: "03" },
+  { href: "/racquets", label: "Catalog", code: "03" },
+  { href: "/about", label: "Spec", code: "04" },
 ];
 
 export function SiteFrame({ children }: { children: ReactNode }) {
@@ -14,7 +15,7 @@ export function SiteFrame({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-20 border-b border-rule-major bg-paper/85 backdrop-blur-[2px]">
         {/* sheet metadata strip */}
         <div className="hidden border-b border-rule px-4 py-1 readout text-[10px] uppercase tracking-[0.2em] text-ink-3 sm:flex sm:gap-6">
-          <span>Sheet 01 / 03</span>
+          <span>Sheet 01 / 04</span>
           <span>Rev. A</span>
           <span>Units · lb / g / mm</span>
           <span className="ml-auto">Squash · Configuration Bench</span>
@@ -57,7 +58,7 @@ export function SiteFrame({ children }: { children: ReactNode }) {
       <footer className="mt-12 border-t border-rule-major">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-6 text-ink-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="readout text-[11px] uppercase tracking-[0.18em]">
-            RacquetBuild · Heuristic model · Not manufacturer data
+            RacquetBuild · Heuristic model · Catalog specs cite source pages
           </p>
           <p className="readout text-[11px] uppercase tracking-[0.18em]">
             Drawn to inform, not to spec a purchase

@@ -51,6 +51,12 @@ export default function Home() {
             >
               Take the fit worksheet
             </Link>
+            <Link
+              href="/racquets"
+              className="flex items-center justify-center gap-2 border border-rule-major px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors hover:border-ink hover:text-ink"
+            >
+              Browse real frames
+            </Link>
           </div>
         </div>
 
@@ -112,12 +118,12 @@ export default function Home() {
             ))}
           </ul>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-2">
-            Scores are a heuristic, not manufacturer data.{" "}
+            Scores are a heuristic. Real racquet specs are source-cited where available.{" "}
             <Link
-              href="/about"
+              href="/racquets"
               className="text-accent-deep underline underline-offset-2 hover:text-accent"
             >
-              See how the model works.
+              Browse the catalog.
             </Link>
           </p>
         </div>

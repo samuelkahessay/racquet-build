@@ -7,8 +7,9 @@ string tension and grip — and read the trade-offs in **power, control, maneuve
 forgiveness and comfort**, drawn live on a blueprint. No jargon, no marketing: a
 transparent heuristic on a drafting table.
 
-> ⚠ RacquetBuild is a learning tool. Scores come from a hand-set heuristic model, not
-> manufacturer measurements or a real racquet database.
+> RacquetBuild is a learning tool. Scores come from a hand-set heuristic model; the
+> catalog preserves source-backed manufacturer/retailer specs and maps them into that
+> model for comparison.
 
 ## Surfaces
 
@@ -16,7 +17,10 @@ transparent heuristic on a drafting table.
   trade-off explanation, and a parametric blueprint drawing update in real time. Every
   build is encoded in the URL (`?c=…`) so any setup is shareable.
 - **`/quiz` — Fit worksheet.** Five quick questions produce a recommended starting build
-  with plain-language reasoning, then drop you into the bench pre-loaded.
+  with plain-language reasoning and closest real-frame matches, then drop you into the
+  bench pre-loaded.
+- **`/racquets` — Source-backed catalog.** Real squash racquet specs are stored with
+  provenance, validated, and mapped into the simulator's config buckets.
 - **`/about` — Model spec.** The exact influence of each variable, rendered straight from
   the scoring coefficient tables.
 
@@ -30,8 +34,8 @@ Both consumers reuse it:
 - The **worksheet** runs it inverse: it turns your answers into an emphasis weighting and
   searches the full grid of builds for the closest match.
 
-The engine, recommender, quiz mapping and share codec live in [`src/lib`](src/lib) — pure,
-framework-agnostic, and fully unit-tested.
+The engine, recommender, catalog mapping, quiz mapping and share codec live in
+[`src/lib`](src/lib) — pure, framework-agnostic, and fully unit-tested.
 
 ## Tech
 

@@ -10,6 +10,7 @@ import {
 } from "@/lib/quiz/questions";
 import { quizToEmphasis } from "@/lib/quiz/emphasis";
 import { recommend, type Recommendation } from "@/lib/scoring/recommend";
+import { recommendCatalog, type CatalogRecommendation } from "@/lib/catalog";
 import { QuizResult } from "./QuizResult";
 
 const TOTAL = QUESTIONS.length + 1; // questions + preference slider
@@ -19,20 +20,25 @@ export function QuizStepper() {
   const [touched, setTouched] = useState<Set<number>>(new Set());
   const [step, setStep] = useState(0);
   const [result, setResult] = useState<Recommendation | null>(null);
+  const [catalogMatches, setCatalogMatches] = useState<CatalogRecommendation[]>([]);
 
   const isPreferenceStep = step === QUESTIONS.length;
 
   const compute = () => {
     const emphasis = quizToEmphasis(answers);
-    setResult(recommend(emphasis, { beginnerBias: answers.level === "beginner" }));
+    const beginnerBias = answers.level === "beginner";
+    setResult(recommend(emphasis, { beginnerBias }));
+    setCatalogMatches(recommendCatalog(emphasis, { beginnerBias, limit: 3 }));
   };
 
   if (result) {
     return (
       <QuizResult
         recommendation={result}
+        catalogMatches={catalogMatches}
         onRetake={() => {
           setResult(null);
+          setCatalogMatches([]);
           setStep(0);
           setTouched(new Set());
           setAnswers(DEFAULT_ANSWERS);
