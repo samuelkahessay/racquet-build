@@ -45,7 +45,7 @@ export function SegmentedControl<T extends string>({
         {code && <span className="readout text-[10px] text-ink-3">{code}</span>}
       </div>
 
-      <div className="grid auto-cols-fr grid-flow-col border border-rule-major">
+      <div className="grid grid-cols-1 border border-rule-major sm:auto-cols-fr sm:grid-flow-col sm:grid-cols-none">
         {options.map((opt, i) => {
           const active = opt.value === value;
           return (
@@ -70,8 +70,8 @@ export function SegmentedControl<T extends string>({
                 }
               }}
               className={clsx(
-                "group relative flex flex-col items-start gap-0.5 px-3 py-2.5 text-left transition-colors",
-                "border-rule-major [&:not(:last-child)]:border-r",
+                "group relative flex min-h-14 flex-col items-start justify-center gap-0.5 px-3 py-2.5 text-left transition-colors",
+                "border-rule-major [&:not(:last-child)]:border-b sm:[&:not(:last-child)]:border-b-0 sm:[&:not(:last-child)]:border-r",
                 active ? "bg-paper" : "bg-paper-2/60 hover:bg-paper-2",
               )}
             >

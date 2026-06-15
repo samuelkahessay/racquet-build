@@ -21,13 +21,13 @@ export function SiteFrame({ children }: { children: ReactNode }) {
           <span className="ml-auto">Squash · Configuration Bench</span>
         </div>
 
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <Link href="/" className="group flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center border border-ink text-ink transition-colors group-hover:border-accent group-hover:text-accent">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <Link href="/" className="group flex min-h-11 min-w-0 items-center gap-3">
+            <span className="flex size-9 shrink-0 items-center justify-center border border-ink text-ink transition-colors group-hover:border-accent group-hover:text-accent">
               <RacquetMark className="size-6" />
             </span>
-            <span className="leading-none">
-              <span className="block font-display text-base font-extrabold uppercase tracking-[0.16em] text-ink">
+            <span className="min-w-0 leading-none">
+              <span className="block truncate font-display text-base font-extrabold uppercase tracking-[0.16em] text-ink">
                 Racquet<span className="text-accent">Build</span>
               </span>
               <span className="readout mt-1 block text-[10px] uppercase tracking-[0.22em] text-ink-3">
@@ -36,17 +36,19 @@ export function SiteFrame({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1 sm:gap-2">
+          <nav className="grid w-full grid-cols-4 gap-1 sm:w-auto sm:flex sm:items-center sm:gap-2">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex items-center gap-2 border border-transparent px-2.5 py-1.5 transition-colors hover:border-rule-major hover:bg-paper-2"
+                className="group flex min-h-11 min-w-0 items-center justify-center gap-1.5 border border-rule px-2 py-2 transition-colors hover:border-rule-major hover:bg-paper-2 sm:min-h-0 sm:justify-start sm:gap-2 sm:border-transparent sm:px-2.5 sm:py-1.5"
               >
-                <span className="readout text-[10px] text-ink-3 group-hover:text-accent">
+                <span className="hidden readout text-[10px] text-ink-3 group-hover:text-accent sm:inline">
                   {item.code}
                 </span>
-                <span className="label text-xs text-ink-2 group-hover:text-ink">{item.label}</span>
+                <span className="label truncate text-[9px] tracking-[0.04em] text-ink-2 group-hover:text-ink sm:text-xs sm:tracking-[0.18em]">
+                  {item.label}
+                </span>
               </Link>
             ))}
           </nav>

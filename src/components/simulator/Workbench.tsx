@@ -100,7 +100,7 @@ export function Workbench({ initialToken }: { initialToken: string | null }) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         {/* controls */}
-        <section className="sheet order-2 flex flex-col gap-5 p-4 lg:order-1 lg:col-span-5">
+        <section className="sheet order-1 flex flex-col gap-5 p-4 lg:order-1 lg:col-span-5">
           <h2 className="label text-xs text-ink-2">Inputs</h2>
           <SegmentedControl
             name="shape"
@@ -147,7 +147,7 @@ export function Workbench({ initialToken }: { initialToken: string | null }) {
         </section>
 
         {/* drawing */}
-        <section className="order-1 lg:order-2 lg:col-span-3">
+        <section className="order-2 lg:order-2 lg:col-span-3">
           <div className="blueprint-panel relative mx-auto aspect-[5/9] w-full max-w-[240px] overflow-hidden">
             <div className="absolute inset-0 p-2">
               <RacquetDrawing config={config} />

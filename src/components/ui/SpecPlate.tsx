@@ -49,9 +49,9 @@ export function SpecPlate({ config, shareUrl, drawingNo, onReset }: SpecPlatePro
 
       <dl className="divide-y divide-rule">
         {rows.map((r) => (
-          <div key={r.k} className="flex items-baseline justify-between px-3 py-1.5">
+          <div key={r.k} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 px-3 py-2">
             <dt className="label text-[10px] text-ink-3">{r.k}</dt>
-            <dd className="flex items-baseline gap-2 text-right">
+            <dd className="flex min-w-0 flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 text-right">
               {r.sub && <span className="readout text-[10px] text-ink-3">{r.sub}</span>}
               <span className="font-display text-sm font-semibold text-ink">{r.v}</span>
             </dd>
@@ -66,7 +66,7 @@ export function SpecPlate({ config, shareUrl, drawingNo, onReset }: SpecPlatePro
             readOnly
             value={shareUrl}
             onFocus={(e) => e.currentTarget.select()}
-            className="readout min-w-0 flex-1 truncate bg-paper-2 px-2 py-1 text-[11px] text-ink-2 outline-none"
+            className="readout min-h-11 min-w-0 flex-1 truncate bg-paper-2 px-2 py-2 text-[11px] text-ink-2 outline-none"
             aria-label="Shareable build link"
           />
         </div>
@@ -74,7 +74,7 @@ export function SpecPlate({ config, shareUrl, drawingNo, onReset }: SpecPlatePro
           <button
             type="button"
             onClick={copy}
-            className="flex flex-1 items-center justify-center gap-1.5 border border-ink bg-ink px-3 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-accent hover:border-accent"
+            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 border border-ink bg-ink px-3 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-accent hover:border-accent"
           >
             {copied ? <Check size={13} /> : <Copy size={13} />}
             {copied ? "Copied" : "Copy link"}
@@ -82,7 +82,7 @@ export function SpecPlate({ config, shareUrl, drawingNo, onReset }: SpecPlatePro
           <button
             type="button"
             onClick={onReset}
-            className="flex items-center justify-center gap-1.5 border border-rule-major px-3 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors hover:border-ink hover:text-ink"
+            className="flex min-h-11 items-center justify-center gap-1.5 border border-rule-major px-3 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors hover:border-ink hover:text-ink"
           >
             <RotateCcw size={13} />
             Reset

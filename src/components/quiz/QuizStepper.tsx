@@ -95,7 +95,7 @@ export function QuizStepper() {
           type="button"
           onClick={() => setStep((s) => Math.max(0, s - 1))}
           disabled={step === 0}
-          className="flex items-center gap-1.5 px-2 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors enabled:hover:text-ink disabled:opacity-30"
+          className="flex min-h-11 items-center gap-1.5 px-2 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors enabled:hover:text-ink disabled:opacity-30"
         >
           <ArrowLeft size={14} />
           Back
@@ -105,7 +105,7 @@ export function QuizStepper() {
           <button
             type="button"
             onClick={compute}
-            className="group flex items-center gap-2 border border-ink bg-ink px-4 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:border-accent hover:bg-accent"
+            className="group flex min-h-11 items-center gap-2 border border-ink bg-ink px-4 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:border-accent hover:bg-accent"
           >
             Compute build
             <Check size={15} />
@@ -114,7 +114,7 @@ export function QuizStepper() {
           <button
             type="button"
             onClick={() => setStep((s) => Math.min(s + 1, TOTAL - 1))}
-            className="group flex items-center gap-1.5 px-2 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors hover:text-ink"
+            className="group flex min-h-11 items-center gap-1.5 px-2 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors hover:text-ink"
           >
             {touched.has(step) ? "Next" : "Skip"}
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />

@@ -122,14 +122,14 @@ export default function RacquetsPage() {
               <div className="mt-4 flex flex-col gap-2 border-t border-rule pt-3 sm:flex-row">
                 <Link
                   href={`/build?c=${token}`}
-                  className="group flex flex-1 items-center justify-center gap-2 border border-ink bg-ink px-3 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:border-accent hover:bg-accent"
+                  className="group flex min-h-11 flex-1 items-center justify-center gap-2 border border-ink bg-ink px-3 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:border-accent hover:bg-accent"
                 >
                   Open in bench
                   <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <a
                   href={primarySource.url}
-                  className="flex flex-1 items-center justify-center border border-rule-major px-3 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors hover:border-ink hover:text-ink"
+                  className="flex min-h-11 flex-1 items-center justify-center border border-rule-major px-3 py-2 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-2 transition-colors hover:border-ink hover:text-ink"
                   rel="noreferrer"
                   target="_blank"
                 >
