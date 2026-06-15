@@ -30,6 +30,12 @@ describe("share/codec", () => {
       expect(decodeConfig(bad)).toBeNull();
     }
   });
+  it("never throws on non-string input (URL boundary hardening)", () => {
+    for (const bad of [["1.h.m.e.s.26"], 42, {}, true, Symbol("x")] as unknown[]) {
+      expect(() => decodeConfig(bad as never)).not.toThrow();
+      expect(decodeConfig(bad as never)).toBeNull();
+    }
+  });
   it("produces a short URL-safe token", () => {
     const token = encodeConfig(DEFAULT_CONFIG);
     expect(token).toMatch(/^[A-Za-z0-9.\-]+$/);

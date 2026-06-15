@@ -27,4 +27,10 @@ describe("scoring/explain", () => {
   it("describe returns a non-empty summary for a non-neutral build", () => {
     expect(describeConfig({ ...DEFAULT_CONFIG, shape: "teardrop" }).length).toBeGreaterThan(0);
   });
+  it("attributes the change to the variable that moved (spec §6.3)", () => {
+    const next = { ...DEFAULT_CONFIG, weightClass: "heavy" as const };
+    const bullets = explain(DEFAULT_CONFIG, next);
+    // the only changed variable is weight (medium -> heavy) => "heavier"
+    expect(bullets[0].toLowerCase()).toContain("heav");
+  });
 });

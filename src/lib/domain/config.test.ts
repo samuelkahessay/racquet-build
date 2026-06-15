@@ -16,6 +16,10 @@ describe("domain/config", () => {
     expect(clampTension(99)).toBe(TENSION_MAX);
     expect(clampTension(25.6)).toBe(26);
   });
+  it("clampTension returns a safe default for non-finite input", () => {
+    expect(clampTension(NaN)).toBe(26);
+    expect(clampTension(Infinity)).toBe(26);
+  });
   it("enumerates all shapes", () => {
     expect(SHAPES).toEqual(["teardrop", "traditional", "hybrid"]);
   });

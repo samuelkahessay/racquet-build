@@ -29,5 +29,8 @@ export const DEFAULT_CONFIG: RacquetConfig = {
 };
 
 export function clampTension(lb: number): number {
+  // Non-finite input (NaN/Infinity) falls back to the neutral pivot so downstream
+  // scoring never produces NaN. Valid numbers are rounded and clamped to range.
+  if (!Number.isFinite(lb)) return TENSION_PIVOT;
   return Math.max(TENSION_MIN, Math.min(TENSION_MAX, Math.round(lb)));
 }

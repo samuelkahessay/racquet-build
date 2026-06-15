@@ -41,9 +41,13 @@ export function encodeConfig(c: RacquetConfig): string {
   ].join(".");
 }
 
-/** Parse a token back to a config, or null if anything is invalid. Never throws. */
-export function decodeConfig(token: string | null | undefined): RacquetConfig | null {
-  if (!token) return null;
+/**
+ * Parse a token back to a config, or null if anything is invalid. Never throws.
+ * Accepts `unknown` because URL/search-param values arrive untyped (and can be
+ * `string[]` when a key repeats).
+ */
+export function decodeConfig(token: unknown): RacquetConfig | null {
+  if (typeof token !== "string" || token.length === 0) return null;
   const parts = token.split(".");
   if (parts.length !== 6) return null;
   const [v, s, w, b, g, tRaw] = parts;

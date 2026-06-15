@@ -45,4 +45,15 @@ describe("scoring/score", () => {
     const s = score({ ...DEFAULT_CONFIG, stringTensionLb: 23 });
     for (const axis of SCORE_AXES) expect(Number.isInteger(s[axis])).toBe(true);
   });
+
+  it("sanitizes non-finite / out-of-range tension instead of producing NaN", () => {
+    for (const t of [NaN, Infinity, -Infinity, 999, -50]) {
+      const s = scoreRaw({ ...DEFAULT_CONFIG, stringTensionLb: t });
+      for (const axis of SCORE_AXES) {
+        expect(Number.isFinite(s[axis])).toBe(true);
+        expect(s[axis]).toBeGreaterThanOrEqual(0);
+        expect(s[axis]).toBeLessThanOrEqual(100);
+      }
+    }
+  });
 });
