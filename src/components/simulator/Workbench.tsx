@@ -55,13 +55,16 @@ export function Workbench({ initialToken }: { initialToken: string | null }) {
   const [origin, setOrigin] = useState("");
   const hydrated = useRef(false);
 
-  // hydrate once from the incoming ?c= link, then capture origin for share URLs
+  // hydrate once from the incoming ?c= link, then capture origin for share URLs.
+  // setOrigin runs in a rAF callback (not synchronously) so SSR/hydration markup
+  // matches and React isn't asked to setState within the effect body.
   useEffect(() => {
     if (!hydrated.current) {
       hydrate(initialToken);
       hydrated.current = true;
     }
-    setOrigin(window.location.origin);
+    const id = requestAnimationFrame(() => setOrigin(window.location.origin));
+    return () => cancelAnimationFrame(id);
   }, [initialToken, hydrate]);
 
   const token = encodeConfig(config);

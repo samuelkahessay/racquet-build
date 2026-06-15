@@ -29,17 +29,22 @@ export function PreviewCanvas({ config }: { config: RacquetConfig }) {
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
-    setWebgl(hasWebGL());
-    setReduced(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
+    // Capability detection in a rAF callback (not synchronously) so the server-rendered
+    // SVG and the first client render agree before upgrading to WebGL.
+    const raf = requestAnimationFrame(() => {
+      setWebgl(hasWebGL());
+      setReduced(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
+    });
 
     const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { rootMargin: "120px" },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+    const obs = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+      rootMargin: "120px",
+    });
+    if (el) obs.observe(el);
+    return () => {
+      cancelAnimationFrame(raf);
+      obs.disconnect();
+    };
   }, []);
 
   // Reduced-motion or no WebGL -> the static SVG (same geometry).
