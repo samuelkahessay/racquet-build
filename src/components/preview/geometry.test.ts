@@ -25,6 +25,10 @@ const longestMain = (shape: typeof DEFAULT_CONFIG.shape) => {
   const g = buildRacquetGeometry({ ...DEFAULT_CONFIG, shape });
   return Math.max(...g.mains.map((m) => Math.abs(m[0][1] - m[1][1])));
 };
+const maxSpacing = (values: number[]) => {
+  const sorted = [...values].sort((a, b) => a - b);
+  return Math.max(...sorted.slice(1).map((value, index) => value - sorted[index]));
+};
 
 describe("preview/geometry", () => {
   it("produces a finite, closed frame loop for every shape", () => {
@@ -101,6 +105,17 @@ describe("preview/geometry", () => {
     expect(high.mains.length).toBeGreaterThanOrEqual(low.mains.length);
     expect(high.crosses.length).toBeGreaterThanOrEqual(low.crosses.length);
     expect(high.stringBrightness).toBeGreaterThan(low.stringBrightness);
+  });
+
+  it("keeps the string-bed spacing tight enough to read as a woven squash pattern", () => {
+    for (const shape of SHAPES) {
+      const g = buildRacquetGeometry({ ...DEFAULT_CONFIG, shape });
+      const mainXs = g.mains.map((main) => main[0][0]);
+      const crossYs = g.crosses.map((cross) => cross[0][1]);
+
+      expect(maxSpacing(mainXs)).toBeLessThanOrEqual(11);
+      expect(maxSpacing(crossYs)).toBeLessThanOrEqual(20);
+    }
   });
 
   it("thickens the beam for heavier frames", () => {

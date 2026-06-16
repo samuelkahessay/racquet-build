@@ -177,8 +177,8 @@ export function buildRacquetGeometry(config: RacquetConfig): RacquetGeometry {
 
   // ---- string bed -------------------------------------------------------
   const t01 = clamp01((config.stringTensionLb - TENSION_MIN) / (TENSION_MAX - TENSION_MIN));
-  const nMains = Math.round(lerp(11, 15, t01));
-  const nCrosses = Math.round(lerp(13, 19, t01));
+  const nMains = Math.round(lerp(15, 19, t01));
+  const nCrosses = Math.round(lerp(22, 30, t01));
   const stringBrightness = lerp(0.4, 1, t01);
 
   const inset = BEAM_WIDTH[config.weightClass] * 0.62 + 3;

@@ -72,6 +72,7 @@ export function QuizStepper() {
           key={QUESTIONS[step].key}
           index={step}
           answers={answers}
+          touched={touched}
           onPick={(key, value) => {
             setAnswers((a) => ({ ...a, [key]: value }));
             setTouched((t) => new Set(t).add(step));
@@ -125,24 +126,41 @@ export function QuizStepper() {
   );
 }
 
+export function isQuestionAnswerVisible<K extends keyof QuizAnswers>(
+  index: number,
+  touched: ReadonlySet<number>,
+  answers: QuizAnswers,
+  key: K,
+  value: QuizAnswers[K],
+): boolean {
+  return touched.has(index) && answers[key] === value;
+}
+
 function QuestionStep({
   index,
   answers,
+  touched,
   onPick,
 }: {
   index: number;
   answers: QuizAnswers;
+  touched: ReadonlySet<number>;
   onPick: <K extends keyof QuizAnswers>(key: K, value: QuizAnswers[K]) => void;
 }) {
   const q = QUESTIONS[index];
-  const current = answers[q.key];
 
   return (
     <fieldset>
       <legend className="font-display text-xl font-bold leading-snug text-ink">{q.prompt}</legend>
       <div className="mt-4 flex flex-col gap-2">
         {q.options.map((opt, i) => {
-          const active = opt.value === current;
+          const active = isQuestionAnswerVisible(
+            index,
+            touched,
+            answers,
+            q.key,
+            opt.value as QuizAnswers[typeof q.key],
+          );
           return (
             <button
               key={String(opt.value)}

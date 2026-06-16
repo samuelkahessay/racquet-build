@@ -48,7 +48,7 @@ export function RacquetDrawing({ config }: { config: RacquetConfig }) {
       <path d={path(g.frame, true)} fill={ink} fillOpacity={0.05} stroke="none" />
 
       {/* string bed */}
-      <g stroke={ink} strokeWidth={0.7} strokeOpacity={g.stringBrightness * 0.7} strokeLinecap="round">
+      <g stroke={ink} strokeWidth={0.55} strokeOpacity={g.stringBrightness * 0.62} strokeLinecap="round">
         {g.mains.map((l, i) => (
           <path key={`m${i}`} d={path(l)} fill="none" />
         ))}
